@@ -5,7 +5,7 @@ const BranchSelector = ({ config, onBranchChange, metric = 'ventas' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
 
-  // Datos de sucursales según la métrica
+  // Datos de sucursales según la métrica    ---- algo
   const branches = {
     ventas: [
       { id: 1, name: 'Sucursal Centro', metric: '$15,420', percentage: 33.7 },
