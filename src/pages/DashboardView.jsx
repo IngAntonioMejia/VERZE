@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Config } from '../components/Config.jsx'; // Importamos la config base
-
-import BranchSelector from '../components/BranchSelector.jsx'; // Importar el selector de sucursales
+import { Config } from '../components/Config.jsx'; 
+import BranchSelector from '../components/BranchSelector.jsx'; 
 
 // --- Función Utilidad ---
 function hexToRgba(hex, alpha) {
@@ -11,7 +10,7 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-// === COMPONENTE DashboardView (Tu DashboardView.jsx) ===
+// === DATOS DE PRUEBA (Mocks) ===
 const modules = [
   { name: 'Ventas', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
   { name: 'Inventario', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
@@ -56,8 +55,6 @@ function DashboardView({ config, user, onLogout }) {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // --- Lógica de hover para Stat Cards ---
-  // En React, es mejor manejar esto con eventos si el estilo es dinámico
   const handleStatCardEnter = (e, cardType) => {
     let hoverBg = '';
     if (cardType === 'users' || cardType === 'projects') {
@@ -73,7 +70,10 @@ function DashboardView({ config, user, onLogout }) {
   };
   
   return (
-    <div className="w-full max-w-7xl fade-in" style={{ padding: '32px 16px' }}>
+    // CAMBIO CLAVE AQUÍ: Quitamos 'max-w-7xl' para que use todo el ancho
+    // Usamos padding generoso (32px) para que no se pegue a los bordes
+    <div className="w-full h-full fade-in" style={{ padding: '32px' }}>
+      
       {/* Header con usuario y módulos */}
       <div className="card rounded-2xl shadow-2xl p-6 mb-8 slide-in-left">
         <div className="flex justify-between items-center">
@@ -109,7 +109,7 @@ function DashboardView({ config, user, onLogout }) {
               <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${config.primary_action_color || Config.primary_action_color}, ${config.secondary_action_color || Config.secondary_action_color})` }}>
                 <span style={{ color: 'white', fontFamily: `${customFont}, ${baseFontStack}`, fontSize: `${baseSize}px`, fontWeight: 600 }}>{user.charAt(0).toUpperCase()}</span>
               </div>
-              <div className="text-left">
+              <div className="text-left hidden sm:block"> {/* Ocultar texto en móviles si se desea */}
                 <p style={{ fontFamily: `${customFont}, ${baseFontStack}`, fontSize: `${baseSize * 0.875}px`, color: config.text_color || Config.text_color, fontWeight: 600 }}>{user}</p>
                 <p style={{ fontFamily: `${customFont}, ${baseFontStack}`, fontSize: `${baseSize * 0.75}px`, color: config.text_color || Config.text_color, opacity: 0.6 }}>Administrador</p>
               </div>
@@ -126,13 +126,6 @@ function DashboardView({ config, user, onLogout }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
                     <span style={{ fontFamily: `${customFont}, ${baseFontStack}`, fontSize: `${baseSize * 0.875}px`, color: config.text_color || Config.text_color }}>Mi Perfil</span>
-                  </a>
-                  <a href="#" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-opacity-10 transition-all" style={{ backgroundColor: 'transparent' }}>
-                    <svg className="w-5 h-5" style={{ color: config.text_color || Config.text_color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span style={{ fontFamily: `${customFont}, ${baseFontStack}`, fontSize: `${baseSize * 0.875}px`, color: config.text_color || Config.text_color }}>Configuración</span>
                   </a>
                   <hr style={{ borderColor: config.text_color || Config.text_color, opacity: 0.1, margin: '8px 0' }} />
                   <button 
@@ -153,7 +146,7 @@ function DashboardView({ config, user, onLogout }) {
         </div>
         
         {isModulesMenuOpen && (
-          <div id="modules-menu" className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div id="modules-menu" className="mt-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
             {modules.map((module, index) => (
               <a 
                 key={module.name}
@@ -189,6 +182,7 @@ function DashboardView({ config, user, onLogout }) {
 
       {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        {/* Card 1 */}
         <div 
           className="stat-card card rounded-xl p-8 shadow-lg cursor-pointer slide-in-left" 
           data-card="users" 
@@ -213,6 +207,7 @@ function DashboardView({ config, user, onLogout }) {
           </div>
         </div>
 
+        {/* Card 2 */}
         <div 
           className="stat-card card rounded-xl p-8 shadow-lg cursor-pointer slide-in-left" 
           data-card="sales" 
@@ -237,6 +232,7 @@ function DashboardView({ config, user, onLogout }) {
           </div>
         </div>
 
+        {/* Card 3 */}
         <div 
           className="stat-card card rounded-xl p-8 shadow-lg cursor-pointer slide-in-left" 
           data-card="projects" 

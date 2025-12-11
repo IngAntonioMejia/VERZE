@@ -1,30 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import LoginView from './pages/LoginView'; // Importamos LoginView
-import DashboardView from './pages/DashboardView'; // Importamos DashboardView
-import { Config } from './components/Config'; // Importamos la config
+import LoginView from './pages/LoginView'; 
+import RegistroUsuario from './pages/RegistroUsuario'; 
+import DashboardView from './pages/DashboardView'; 
+import { Config } from './components/Config'; 
 
-// ¡Asegúrate de que tu main.jsx o index.jsx importe tu archivo index.css!
-// No necesitas importar GlobalStyles aquí nunca más.
-
-// === COMPONENTE PRINCIPAL (Tu App.jsx) ===
 export default function App() {
-  const [currentView, setCurrentView] = useState('login'); // 'login' o 'dashboard'
+  const [currentView, setCurrentView] = useState('login'); 
   const [currentUser, setCurrentUser] = useState('');
   
-  // Aquí simulamos la carga de la configuración.
-  // En tu app, esto podría venir del "elementSdk"
   const [config, setConfig] = useState(Config);
 
-  // --- Lógica del SDK (simulada) ---
-  // Tu código original dependía de 'window.elementSdk'.
-  // Esta es una forma de manejarlo en React.
-  // Por ahora, solo usamos la configuración por defecto.
   useEffect(() => {
-    // Aquí iría la lógica de 'window.elementSdk.init' si fuera necesario
-    // Por ejemplo, para recibir una config actualizada:
-    // window.elementSdk.onConfigChange(setConfig);
-    
-    // Aplicamos el color de fondo al body
     document.body.style.background = `linear-gradient(135deg, ${config.background_color || Config.background_color} 0%, #FBCFE8 50%, #DDD6FE 100%)`;
   }, [config]);
 
@@ -39,20 +25,46 @@ export default function App() {
     setCurrentView('login');
   };
 
+  const handleRegisterSuccess = () => {
+    setCurrentView('login');
+  };
+
+  // Variable para saber si estamos en el dashboard
+  const isDashboard = currentView === 'dashboard';
+
   return (
     <>
-      {/* Ya no necesitamos <GlobalStyles /> aquí */}
       <div 
-        className="app-container min-h-full flex items-center justify-center p-4"
+        // CAMBIO CLAVE AQUÍ:
+        // Si es Dashboard: 'min-h-screen w-full' (Ocupa todo, alineado arriba a la izquierda)
+        // Si es Login/Registro: 'min-h-screen flex items-center justify-center p-4' (Centrado flotante)
+        className={`app-container min-h-screen ${isDashboard ? 'w-full' : 'flex items-center justify-center p-4'}`}
         style={{
-          // Dejamos este fondo por si acaso, aunque el body ya debería tenerlo
           background: `linear-gradient(135deg, ${config.background_color || Config.background_color} 0%, #FBCFE8 50%, #DDD6FE 100%)`
         }}
       >
-        {currentView === 'login' ? (
-          <LoginView config={config} onLogin={handleLogin} />
-        ) : (
-          <DashboardView config={config} user={currentUser} onLogout={handleLogout} />
+        {currentView === 'login' && (
+          <LoginView 
+            config={config} 
+            onLogin={handleLogin} 
+            onGoToRegister={() => setCurrentView('register')} 
+          />
+        )}
+
+        {currentView === 'register' && (
+          <RegistroUsuario 
+            config={config}
+            onRegisterSuccess={handleRegisterSuccess}
+            onCancel={() => setCurrentView('login')}
+          />
+        )}
+
+        {currentView === 'dashboard' && (
+          <DashboardView 
+            config={config} 
+            user={currentUser} 
+            onLogout={handleLogout} 
+          />
         )}
       </div>
     </>
