@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import LoginView from './pages/LoginView'; 
-import RegistroUsuario from './pages/RegistroUsuario'; // Importamos la nueva vista
+import RegistroUsuario from './pages/RegistroUsuario'; 
 import DashboardView from './pages/DashboardView'; 
 import { Config } from './components/Config'; 
 
 export default function App() {
-  // Ahora tenemos 3 estados posibles: 'login', 'register', 'dashboard'
   const [currentView, setCurrentView] = useState('login'); 
   const [currentUser, setCurrentUser] = useState('');
   
@@ -26,20 +25,24 @@ export default function App() {
     setCurrentView('login');
   };
 
-  // Función para volver al login tras registrarse
   const handleRegisterSuccess = () => {
     setCurrentView('login');
   };
 
+  // Variable para saber si estamos en el dashboard
+  const isDashboard = currentView === 'dashboard';
+
   return (
     <>
       <div 
-        className="app-container min-h-full flex items-center justify-center p-4"
+        // CAMBIO CLAVE AQUÍ:
+        // Si es Dashboard: 'min-h-screen w-full' (Ocupa todo, alineado arriba a la izquierda)
+        // Si es Login/Registro: 'min-h-screen flex items-center justify-center p-4' (Centrado flotante)
+        className={`app-container min-h-screen ${isDashboard ? 'w-full' : 'flex items-center justify-center p-4'}`}
         style={{
           background: `linear-gradient(135deg, ${config.background_color || Config.background_color} 0%, #FBCFE8 50%, #DDD6FE 100%)`
         }}
       >
-        {/* Lógica de navegación simple */}
         {currentView === 'login' && (
           <LoginView 
             config={config} 
