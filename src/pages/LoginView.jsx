@@ -4,15 +4,49 @@ import { Config } from '../components/Config'; // Importamos la config base
 // === COMPONENTE LoginView (Tu LoginView.jsx) ===
 function LoginView({ config, onLogin }) {
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState(''); // Agregamos estado para la contraseña
+  const [error, setError] = useState(null); // Estado para mostrar errores de login
+  const [isLoading, setIsLoading] = useState(false); // Estado de carga
   
   const customFont = config.font_family || Config.font_family;
   const baseSize = config.font_size || Config.font_size;
   const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username) {
-      onLogin(username);
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      // 1. Llamada a tu Backend Laravel
+      const response = await fetch('http://127.0.0.1:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 2. Si el login es correcto (Laravel devolvió 200)
+        console.log("Usuario logueado:", data.user);
+        onLogin(username); // Llamamos a la función de App.jsx para cambiar de vista
+      } else {
+        // 3. Si hubo error (Laravel devolvió 401 o 403)
+        setError(data.message || 'Error al iniciar sesión');
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError('No se pudo conectar con el servidor.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,6 +77,13 @@ function LoginView({ config, onLogin }) {
         </p>
       </div>
 
+      {/* Mensaje de Error */}
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm text-center">
+          {error}
+        </div>
+      )}
+
       <form id="login-form" className="space-y-6" onSubmit={handleSubmit}>
         <div className="slide-in-left" style={{ animationDelay: '0.2s' }}>
           <label 
@@ -61,6 +102,7 @@ function LoginView({ config, onLogin }) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required 
+            disabled={isLoading}
           />
         </div>
 
@@ -78,16 +120,29 @@ function LoginView({ config, onLogin }) {
             className="input-field w-full px-4 py-3 rounded-lg border-2" 
             style={{ fontFamily: `${customFont}, ${baseFontStack}`, fontSize: `${baseSize}px`, borderColor: '#E2E8F0', backgroundColor: config.surface_color || Config.surface_color }}
             placeholder="Ingresa tu contraseña" 
-            required 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={isLoading}
           />
         </div>
 
         <button 
           type="submit" 
-          className="btn-primary w-full py-4 rounded-lg font-bold shadow-lg slide-in-left" 
-          style={{ fontFamily: `${customFont}, ${baseFontStack}`, fontSize: `${baseSize * 1.125}px`, background: `linear-gradient(135deg, ${config.primary_action_color || Config.primary_action_color}, ${config.secondary_action_color || Config.secondary_action_color})`, boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', color: 'white', animationDelay: '0.4s' }}
+          disabled={isLoading}
+          className="btn-primary w-full py-4 rounded-lg font-bold shadow-lg slide-in-left transition-transform active:scale-95" 
+          style={{ 
+            fontFamily: `${customFont}, ${baseFontStack}`, 
+            fontSize: `${baseSize * 1.125}px`, 
+            background: `linear-gradient(135deg, ${config.primary_action_color || Config.primary_action_color}, ${config.secondary_action_color || Config.secondary_action_color})`, 
+            boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', 
+            color: 'white', 
+            animationDelay: '0.4s',
+            opacity: isLoading ? 0.7 : 1,
+            cursor: isLoading ? 'not-allowed' : 'pointer'
+          }}
         >
-          Ingresar
+          {isLoading ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>
 
